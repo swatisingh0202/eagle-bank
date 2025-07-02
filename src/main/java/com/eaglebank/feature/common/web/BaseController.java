@@ -1,4 +1,4 @@
-package com.eaglebank.feature.common.exception.web;
+package com.eaglebank.feature.common.web;
 
 
 import com.eaglebank.feature.auth.JwtProvider;

@@ -1,7 +1,7 @@
 package com.eaglebank.feature.user.web;
 
 import com.eaglebank.feature.auth.JwtProvider;
-import com.eaglebank.feature.common.exception.web.BaseController;
+import com.eaglebank.feature.common.web.BaseController;
 import com.eaglebank.feature.user.service.UserService;
 import com.eaglebank.feature.user.web.model.CreateUserRequest;
 import com.eaglebank.feature.user.web.model.UpdateUserRequest;
