@@ -28,4 +28,9 @@ public class IdentityRepository {
         jdbcTemplate.update("INSERT INTO identity(identity_id, email, password, user_id) VALUES (?, ?, ?, ?)",
                 UUID.randomUUID(), email, password, userId);
     }
+
+    public void deleteIdentity(UUID userId) {
+        String sql = "DELETE FROM identity WHERE user_id = ?";
+        jdbcTemplate.update(sql, userId);
+    }
 }

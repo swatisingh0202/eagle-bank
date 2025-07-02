@@ -53,8 +53,10 @@ public class BankAccountController extends BaseController {
 
     @GetMapping("/{accountId}")
     @Operation(summary = "Fetch bank account by account id")
-    public BankAccountResponse getAccount(@PathVariable UUID accountId) {
-        return bankAccountService.getAccount(accountId);
+    public BankAccountResponse getAccount(@PathVariable UUID accountId,
+                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        UUID userId = getAuthenticatedUserId(authHeader);
+        return bankAccountService.getAccountForUser(accountId, userId);
     }
 
     @PatchMapping("/{accountId}")

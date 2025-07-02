@@ -7,6 +7,8 @@ import com.eaglebank.feature.account.web.model.AccountType;
 import com.eaglebank.feature.account.web.model.BankAccountResponse;
 import com.eaglebank.feature.account.web.model.CreateBankAccountRequest;
 import com.eaglebank.feature.account.web.model.UpdateBankAccountRequest;
+import com.eaglebank.feature.common.exception.IdentityException;
+import com.eaglebank.feature.common.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,5 +90,21 @@ public class BankAccountService {
                 .balance(bankAccount.getBalance())
                 .currency(bankAccount.getCurrency())
                 .build();
+    }
+
+    public BankAccountResponse getAccountForUser(UUID accountId, UUID userId) {
+        BankAccount bankAccount;
+        try {
+            bankAccount = bankAccountRepository.getAccount(accountId);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Bank account not found");
+        }
+        if (bankAccount == null) {
+            throw new ResourceNotFoundException("Bank account not found");
+        }
+        if (!bankAccount.getUserId().equals(userId)) {
+            throw new IdentityException("You are not authorized to access this bank account.");
+        }
+        return bankAccountResponse(userId, accountId, bankAccount);
     }
 }

@@ -1,6 +1,7 @@
 package com.eaglebank.feature.user.service;
 
 import com.eaglebank.feature.account.repository.BankAccountRepository;
+import com.eaglebank.feature.account.repository.domain.BankAccount;
 import com.eaglebank.feature.auth.service.IdentityService;
 import com.eaglebank.feature.common.exception.ConflictException;
 import com.eaglebank.feature.common.exception.ResourceNotFoundException;
@@ -55,7 +56,7 @@ class UserServiceTest {
     void deleteUser_withBankAccounts_conflict() {
         // Given
         when(userRepository.getUser(userId)).thenReturn(user);
-        when(bankAccountRepository.getAccountsByUserId(userId)).thenReturn(List.of(mock(Object.class)));
+        when(bankAccountRepository.getAccountsByUserId(userId)).thenReturn(List.of(mock(BankAccount.class)));
         // When & Then
         assertThrows(ConflictException.class, () -> userService.deleteUser(userId));
         verify(userRepository, never()).deleteUser(userId);
