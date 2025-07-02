@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -82,5 +83,10 @@ public class BankAccountRepository {
     public Integer countBankAccounts(UUID accountId, UUID userId) {
         String sql = "SELECT COUNT(*) FROM bank_account WHERE account_id = ? AND user_id = ? ";
         return jdbcTemplate.queryForObject(sql, Integer.class, accountId, userId);
+    }
+
+    public List<BankAccount> getAccountsByUserId(UUID userId) {
+        String sql = "SELECT * FROM bank_account WHERE user_id = ?";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(BankAccount.class), userId);
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -69,4 +70,10 @@ public class BankAccountController extends BaseController {
         bankAccountService.deleteAccount(accountId);
     }
 
+    @GetMapping
+    @Operation(summary = "Fetch all bank accounts for the authenticated user")
+    public List<BankAccountResponse> getAccountsForUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        UUID userId = getAuthenticatedUserId(authHeader);
+        return bankAccountService.getAccountsByUserId(userId);
+    }
 }

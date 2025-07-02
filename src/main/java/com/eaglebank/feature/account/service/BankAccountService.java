@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.eaglebank.feature.account.service.BankAccountUtils.generateAccountNumber;
 import static com.eaglebank.feature.account.service.BankAccountUtils.generateSortCode;
@@ -38,6 +40,13 @@ public class BankAccountService {
     public BankAccountResponse getAccount(UUID accountId) {
         BankAccount bankAccount = bankAccountRepository.getAccount(accountId);
         return bankAccountResponse(bankAccount.getUserId(), accountId, bankAccount);
+    }
+
+    public List<BankAccountResponse> getAccountsByUserId(UUID userId) {
+        List<BankAccount> accounts = bankAccountRepository.getAccountsByUserId(userId);
+        return accounts.stream()
+                .map(acc -> bankAccountResponse(acc.getUserId(), acc.getAccountId(), acc))
+                .collect(Collectors.toList());
     }
 
     @Transactional

@@ -16,6 +16,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
+
 import static com.eaglebank.feature.common.TestIds.ACCOUNT_ID;
 import static com.eaglebank.feature.common.TestIds.USER_ID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -85,6 +87,17 @@ class BankAccountControllerTest {
         mockMvc.perform(delete("/v1/accounts/" + ACCOUNT_ID))
                 .andExpect(status().isOk());
         verify(bankAccountService).deleteAccount(ACCOUNT_ID);
+    }
+
+    @Test
+    void getAccountsForUser() throws Exception {
+        String token = "123456";
+        when(jwtProvider.getUserId(token)).thenReturn(USER_ID);
+        when(bankAccountService.getAccountsByUserId(USER_ID)).thenReturn(List.of(bankAccountResponse));
+        mockMvc.perform(get("/v1/accounts")
+                        .header("Authorization", token))
+                .andExpect(status().isOk());
+        verify(bankAccountService).getAccountsByUserId(USER_ID);
     }
 
 }
