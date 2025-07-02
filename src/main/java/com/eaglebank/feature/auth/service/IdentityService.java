@@ -42,4 +42,8 @@ public class IdentityService {
 
         return jwtProvider.generateToken(identity.getUserId());
     }
+
+    public void deleteIdentity(UUID userId) {
+        identityRepository.deleteIdentity(userId);
+    }
 }

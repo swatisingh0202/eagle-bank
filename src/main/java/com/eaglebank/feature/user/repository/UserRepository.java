@@ -42,4 +42,9 @@ public class UserRepository {
         String sql = "UPDATE users SET name = ?, phone = ? WHERE user_id = ?";
         jdbcTemplate.update(sql, user.getName(), user.getPhone(), userId);
     }
+
+    public void deleteUser(UUID userId) {
+        String sql = "DELETE FROM users WHERE user_id = ?";
+        jdbcTemplate.update(sql, userId);
+    }
 }

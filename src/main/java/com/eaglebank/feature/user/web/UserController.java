@@ -61,4 +61,19 @@ public class UserController extends BaseController {
         validateUserId(userId, authHeader);
         userService.updateUser(userId, updateUserRequest);
     }
+
+    @DeleteMapping("/{userId}")
+    @Operation(summary = "Delete user", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "User deleted"),
+        @ApiResponse(responseCode = "403", description = "Forbidden"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "409", description = "User has bank account(s)")
+    })
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId,
+                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) throws AccessDeniedException {
+        validateUserId(userId, authHeader);
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

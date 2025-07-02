@@ -7,6 +7,9 @@ import com.eaglebank.feature.user.repository.domain.User;
 import com.eaglebank.feature.user.web.model.CreateUserRequest;
 import com.eaglebank.feature.user.web.model.UpdateUserRequest;
 import com.eaglebank.feature.user.web.model.UserResponse;
+import com.eaglebank.feature.common.exception.ResourceNotFoundException;
+import com.eaglebank.feature.common.exception.ConflictException;
+import com.eaglebank.feature.account.repository.BankAccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +19,12 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final IdentityService identityService;
+    private final BankAccountRepository bankAccountRepository;
 
-    public UserService(UserRepository userRepository, IdentityService identityService) {
+    public UserService(UserRepository userRepository, IdentityService identityService, BankAccountRepository bankAccountRepository) {
         this.userRepository = userRepository;
         this.identityService = identityService;
+        this.bankAccountRepository = bankAccountRepository;
     }
 
     @Transactional
@@ -38,6 +43,22 @@ public class UserService {
     @Transactional
     public void updateUser(UUID userId, UpdateUserRequest updateUserRequest) {
         userRepository.updateUser(userId, user(updateUserRequest));
+    }
+
+    @Transactional
+    public void deleteUser(UUID userId) {
+        // Check if user exists
+        User user = userRepository.getUser(userId);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        // Check if user has any bank accounts
+        int accountCount = bankAccountRepository.getAccountsByUserId(userId).size();
+        if (accountCount > 0) {
+            throw new ConflictException("User has bank account(s)");
+        }
+        userRepository.deleteUser(userId);
+        identityService.deleteIdentity(userId);
     }
 
     private User user(CreateUserRequest createUserRequest) {

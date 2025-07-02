@@ -1,5 +1,6 @@
 package com.eaglebank.feature.common.web;
 
+import com.eaglebank.feature.common.exception.ConflictException;
 import com.eaglebank.feature.common.exception.InsufficientFundsException;
 import com.eaglebank.feature.common.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<String> handleConflictException(ConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }
 
