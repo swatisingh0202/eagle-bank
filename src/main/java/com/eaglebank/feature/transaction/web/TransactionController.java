@@ -6,6 +6,9 @@ import com.eaglebank.feature.transaction.service.TransactionService;
 import com.eaglebank.feature.transaction.web.model.TransactionRequest;
 import com.eaglebank.feature.transaction.web.model.TransactionResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -33,13 +36,16 @@ public class TransactionController extends BaseController {
     }
 
     @PostMapping()
-    @Operation(summary = "Create a transaction")
+    @Operation(
+            summary = "Create a new transaction",
+            description = "Creates a new transaction for the specified account."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "201", description = "Transaction created"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Access token is missing or invalid"),
             @ApiResponse(responseCode = "403", description = "Operation not allowed"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "404", description = "Account not found"),
             @ApiResponse(responseCode = "422", description = "Insufficient funds to process transaction"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
@@ -52,16 +58,45 @@ public class TransactionController extends BaseController {
     }
 
     @GetMapping()
-    public List<TransactionResponse> listTransactions(@PathVariable UUID accountId,
-                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) throws AccessDeniedException {
+    @Operation(
+            summary = "List all transactions for an account",
+            description = "Retrieves all transactions for the specified account."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of transactions",
+                    content = @Content(schema = @Schema(implementation = TransactionResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid"),
+            @ApiResponse(responseCode = "404", description = "Account not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    public List<TransactionResponse> listTransactions(
+            @Parameter(description = "Account ID", required = true)
+            @PathVariable UUID accountId,
+            @Parameter(description = "Bearer token", required = true)
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) throws AccessDeniedException {
         UUID userId = getAuthenticatedUserId(authHeader);
         return transactionService.getTransactions(accountId, userId);
     }
 
     @GetMapping("/{transactionId}")
-    public TransactionResponse getTransactionById(@PathVariable UUID accountId,
-                                                  @PathVariable UUID transactionId,
-                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) throws AccessDeniedException {
+    @Operation(
+            summary = "Get transaction by ID",
+            description = "Retrieves a transaction by its unique transaction ID for the specified account."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Transaction found",
+                    content = @Content(schema = @Schema(implementation = TransactionResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid"),
+            @ApiResponse(responseCode = "404", description = "Transaction not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    public TransactionResponse getTransactionById(
+            @Parameter(description = "Account ID", required = true)
+            @PathVariable UUID accountId,
+            @Parameter(description = "Transaction ID", required = true)
+            @PathVariable UUID transactionId,
+            @Parameter(description = "Bearer token", required = true)
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) throws AccessDeniedException {
         UUID userId = getAuthenticatedUserId(authHeader);
         return transactionService.getTransaction(transactionId, accountId, userId);
     }

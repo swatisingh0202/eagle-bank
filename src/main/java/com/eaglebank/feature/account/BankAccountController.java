@@ -7,6 +7,8 @@ import com.eaglebank.feature.account.web.model.UpdateBankAccountRequest;
 import com.eaglebank.feature.auth.JwtProvider;
 import com.eaglebank.feature.common.web.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -52,30 +54,70 @@ public class BankAccountController extends BaseController {
     }
 
     @GetMapping("/{accountId}")
-    @Operation(summary = "Fetch bank account by account id")
+    @Operation(
+            summary = "Fetch bank account by account id",
+            description = "Retrieves a bank account by its unique account ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bank account found",
+                    content = @Content(schema = @Schema(implementation = BankAccountResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid"),
+            @ApiResponse(responseCode = "404", description = "Bank account not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     public BankAccountResponse getAccount(@PathVariable UUID accountId,
                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         UUID userId = getAuthenticatedUserId(authHeader);
         return bankAccountService.getAccountForUser(accountId, userId);
     }
 
+    @GetMapping
+    @Operation(
+            summary = "Fetch all bank accounts for the authenticated user",
+            description = "Retrieves all bank accounts associated with the authenticated user."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of bank accounts",
+                    content = @Content(schema = @Schema(implementation = BankAccountResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    public List<BankAccountResponse> getAccountsForUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        UUID userId = getAuthenticatedUserId(authHeader);
+        return bankAccountService.getAccountsByUserId(userId);
+    }
+
     @PatchMapping("/{accountId}")
-    @Operation(summary = "Update bank account")
+    @Operation(
+            summary = "Update bank account",
+            description = "Updates details of an existing bank account."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Bank account updated"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid"),
+            @ApiResponse(responseCode = "404", description = "Bank account not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     public void updateAccount(@PathVariable UUID accountId,
                               @Valid @RequestBody UpdateBankAccountRequest account) {
         bankAccountService.updateAccount(accountId, account);
     }
 
     @DeleteMapping("/{accountId}")
-    @Operation(summary = "Delete bank account")
+    @Operation(
+            summary = "Delete bank account",
+            description = "Deletes a bank account by its unique account ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Bank account deleted"),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid"),
+            @ApiResponse(responseCode = "404", description = "Bank account not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     public void deleteAccount(@PathVariable UUID accountId) {
         bankAccountService.deleteAccount(accountId);
     }
 
-    @GetMapping
-    @Operation(summary = "Fetch all bank accounts for the authenticated user")
-    public List<BankAccountResponse> getAccountsForUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
-        UUID userId = getAuthenticatedUserId(authHeader);
-        return bankAccountService.getAccountsByUserId(userId);
-    }
+
 }

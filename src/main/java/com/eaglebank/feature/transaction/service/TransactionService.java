@@ -68,7 +68,7 @@ public class TransactionService {
                 .toList();
     }
 
-    public TransactionResponse getTransaction(UUID transactionIdId, UUID accountId, UUID userId) throws AccessDeniedException {
+    public TransactionResponse getTransaction(UUID transactionId, UUID accountId, UUID userId) throws AccessDeniedException {
         Integer count = bankAccountRepository.countBankAccounts(accountId, userId);
         if (count == null) {
             throw new ResourceNotFoundException("Account not found");
@@ -76,7 +76,7 @@ public class TransactionService {
         if (count == 0) {
             throw new AccessDeniedException("Account not found or access denied");
         }
-        Transaction transaction = transactionRepository.getTransaction(transactionIdId, accountId);
+        Transaction transaction = transactionRepository.getTransaction(transactionId, accountId);
         if (transaction == null) {
             throw new ResourceNotFoundException("Transaction not found for this account");
         }
