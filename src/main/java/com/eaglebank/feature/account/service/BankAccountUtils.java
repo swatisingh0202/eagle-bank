@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class BankAccountUtils {
 
+    private BankAccountUtils() {
+        // Prevent instantiation
+    }
     public static String generateAccountNumber() {
         Random random = new Random();
 

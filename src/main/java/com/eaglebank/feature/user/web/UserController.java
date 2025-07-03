@@ -47,6 +47,11 @@ public class UserController extends BaseController {
 
     @GetMapping("/{userId}")
     @Operation(summary = "Fetch user by user id", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     public UserResponse getUser(@PathVariable UUID userId,
                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) throws AccessDeniedException {
         validateUserId(userId, authHeader);
@@ -55,6 +60,12 @@ public class UserController extends BaseController {
 
     @PatchMapping("/{userId}")
     @Operation(summary = "Update user", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "User updated"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     public void updateUser(@PathVariable UUID userId,
                            @Valid @RequestBody UpdateUserRequest updateUserRequest,
                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) throws AccessDeniedException {

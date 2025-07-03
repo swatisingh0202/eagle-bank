@@ -13,6 +13,7 @@ import java.io.IOException;
 @Order(1)
 public class JwtFilter extends OncePerRequestFilter {
 
+    public static final String AUTHORIZATION = "Authorization";
     private final JwtProvider jwtProvider;
 
     public JwtFilter(JwtProvider jwtProvider) {
@@ -31,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader(AUTHORIZATION);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
